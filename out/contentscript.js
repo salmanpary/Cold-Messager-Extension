@@ -1,3 +1,6 @@
+//bug button click
+//format ->
+//3 times
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "runContentScript") {
     const nameElement = document.querySelector(

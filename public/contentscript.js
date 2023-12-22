@@ -1,3 +1,8 @@
+//bug button click
+//format ->
+//3 times
+//resolve ->fields 
+//set timeout issue
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "runContentScript") {
     const nameElement = document.querySelector(
