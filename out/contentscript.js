@@ -1042,9 +1042,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     // Function to handle button click
     function fillContentEditableWithDummyText() {
       console.log("fillContentEditableWithDummyText called");
-     
-        const contentEditableDiv = document.querySelector('.msg-form__contenteditable');
+
+        const contentEditableDivNodelist = document.querySelectorAll('.msg-form__contenteditable');
+        const contentEditableDiv = contentEditableDivNodelist.item(contentEditableDivNodelist.length -1 );
         console.log(contentEditableDiv);
+
         if (contentEditableDiv) {
           // Replace this with your desired dummy text
           const dummyText = 'Hello, this is dummy text!';
@@ -1067,7 +1069,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     function handleButtonClick() {
       console.log("Button clicked!");
       // Your custom logic for button click
-      fillContentEditableWithDummyText();
+      setTimeout(() => {
+        fillContentEditableWithDummyText()
+      },300);
+      //fillContentEditableWithDummyText();
     }
   
     // Check if button1 exists
