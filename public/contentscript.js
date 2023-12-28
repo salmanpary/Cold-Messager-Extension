@@ -1028,9 +1028,9 @@ console.log(extractedData);
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "runContentScript") {
     let extractedData;
-    setTimeout(() => {
-      extractedData= Smiritifunction3();
-    }, 1000);
+    // setTimeout(() => {
+    //   extractedData= Smiritifunction3();
+    // }, 1000);
     const button = document.querySelector(
       ".artdeco-button.artdeco-button--2.artdeco-button--primary.ember-view.pvs-profile-actions__action"
     );
@@ -1068,6 +1068,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     
     function handleButtonClick() {
         console.log("Button clicked!");
+        extractedData = Smiritifunction3();
         // Your custom logic for button click
         setTimeout(() => {
           fillContentEditableWithDummyText()
