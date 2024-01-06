@@ -6,7 +6,7 @@ function extractExperience() {
         if (divWithExp) {
             const expSection = divWithExp.closest('section');
             const expUl = expSection.querySelector('ul.pvs-list');
-            const expLi = expUl.querySelectorAll('li.artdeco-list__item.qiKsLKoCUWtHqyagDivfYcjmKwgXlGodspDy.TPbZDJYZHPlKCdaCvYdpSYAYPoBvcsnjmfxA');
+            const expLi = expUl.querySelectorAll('li.artdeco-list__item');
             const expArray = [];
             const roleDescriptionSet = new Set(); // Set to store unique role descriptions
     
@@ -17,12 +17,13 @@ function extractExperience() {
                 if (company_link) {
                     expObj['company_link'] = company_link.href;
                 }
-                // maindiv = title + basic details
+                // maindiv = titlxe + basic details
                 const mainDiv = li.querySelector('div.display-flex.flex-row.justify-space-between');
                 if (mainDiv) {
+                    
                     const locationSpan = mainDiv.querySelector('span.t-14.t-normal');
                     const durationSpan = mainDiv.querySelector('span.t-black--light');
-    
+
                     const listDiv = li.querySelector('div.pvs-list__outer-container.pvs-entity__sub-components');
     // listdiv = extra details
                     if (listDiv) {
@@ -34,7 +35,7 @@ function extractExperience() {
                             expObj['duration'] = locationSpan.querySelector('span.visually-hidden').innerText.trim();
     
                             const roles = [];
-                            const multipleRolesLi = listDiv.querySelectorAll('li.TPbZDJYZHPlKCdaCvYdpSYAYPoBvcsnjmfxA');
+                            const multipleRolesLi = listDiv.querySelectorAll('li');
                             for (let j = 0; j < multipleRolesLi.length; j++) {
                                 const roleObj = {};
                                 const currRole = multipleRolesLi[j];
@@ -50,10 +51,13 @@ function extractExperience() {
                                         const roleDescriptionLi = roleDescriptionUl.querySelectorAll('li');
                                         const rDArray = [];
                                         for (let k = 0; k < roleDescriptionLi.length; k++) {
-                                            const descriptionText = roleDescriptionLi[k].querySelector('span.visually-hidden').innerText.trim();
-                                            if (!roleDescriptionSet.has(descriptionText)) {
-                                                roleDescriptionSet.add(descriptionText);
-                                                rDArray.push(descriptionText);
+                                            const descriptionTextSpan = roleDescriptionLi[k].querySelector('span.visually-hidden')
+                                            if (descriptionTextSpan) {
+                                                const descriptionText = descriptionTextSpan.innerText.trim()
+                                                if (!roleDescriptionSet.has(descriptionText)) {
+                                                    roleDescriptionSet.add(descriptionText);
+                                                    rDArray.push(descriptionText);
+                                                }
                                             }
                                         }
                                         roleObj['role_description'] = rDArray;
@@ -72,37 +76,47 @@ function extractExperience() {
     // incase of multiple roles, location spam and duration span intercahnges
     
                             const roles = [];
-                            const multipleRolesLi = listDiv.querySelectorAll('li.TPbZDJYZHPlKCdaCvYdpSYAYPoBvcsnjmfxA');
-                            for (let j = 0; j < multipleRolesLi.length; j++) {
-                                const roleObj = {};
-                                const currRole = multipleRolesLi[j];
-                                const roleTitle = currRole.querySelector('div.display-flex.align-items-center.mr1.hoverable-link-text.t-bold');
-                                const roleDuration = currRole.querySelector('span.t-14.t-normal.t-black--light');
-                                if (roleTitle && roleDuration) {
-                                    const roleDescriptionDiv = currRole.querySelector('div.pvs-list__outer-container.pvs-entity__sub-components');
-                                    roleObj['role'] = roleTitle.querySelector('span.visually-hidden').innerText.trim();
-                                    roleObj['duration'] = roleDuration.querySelector('span.visually-hidden').innerText.trim();
-    
-                                    if (roleDescriptionDiv) {
-                                        const roleDescriptionUl = roleDescriptionDiv.querySelector('ul');
-                                        const roleDescriptionLi = roleDescriptionUl.querySelectorAll('li');
-                                        const rDArray = [];
-                                        for (let k = 0; k < roleDescriptionLi.length; k++) {
-                                            const descriptionText = roleDescriptionLi[k].querySelector('span.visually-hidden').innerText.trim();
-                                            if (!roleDescriptionSet.has(descriptionText)) {
-                                                roleDescriptionSet.add(descriptionText);
-                                                rDArray.push(descriptionText);
+                            const multipleRolesLi = listDiv.querySelectorAll('li');
+                            console.log(multipleRolesLi)
+
+                            try{
+                                for (let j = 0; j < multipleRolesLi.length; j++) {
+                                    const roleObj = {};
+                                    const currRole = multipleRolesLi[j];
+                                    const roleTitle = currRole.querySelector('div.display-flex.align-items-center.mr1.hoverable-link-text.t-bold');
+                                    const roleDuration = currRole.querySelector('span.t-14.t-normal.t-black--light');
+                                    if (roleTitle && roleDuration) {
+                                        const roleDescriptionDiv = currRole.querySelector('div.pvs-list__outer-container.pvs-entity__sub-components');
+                                        roleObj['role'] = roleTitle.querySelector('span.visually-hidden').innerText.trim();
+                                        roleObj['duration'] = roleDuration.querySelector('span.visually-hidden').innerText.trim();
+                                        console.log('reldesc')
+                                        if (roleDescriptionDiv) {
+                                            const roleDescriptionUl = roleDescriptionDiv.querySelector('ul');
+                                            const roleDescriptionLi = roleDescriptionUl.querySelectorAll('li');
+                                            const rDArray = [];
+                                            for (let k = 0; k < roleDescriptionLi.length; k++) {
+                                                const descriptionTextSpan = roleDescriptionLi[k].querySelector('span.visually-hidden')
+                                                if (descriptionTextSpan) {
+                                                    const descriptionText = descriptionTextSpan.innerText.trim();
+                                                    if (!roleDescriptionSet.has(descriptionText)) {
+                                                        roleDescriptionSet.add(descriptionText);
+                                                        rDArray.push(descriptionText);
+                                                    }
+                                                }
                                             }
+                                            roleObj['role_description'] = rDArray;
                                         }
-                                        roleObj['role_description'] = rDArray;
+        
+                                        roles.push(roleObj);
                                     }
-    
-                                    roles.push(roleObj);
                                 }
+                            } catch(error) {
+                                console.log(error)
                             }
-    
+
                             if (roles.length > 0) {
                                 expObj['roles'] = roles;
+                                console.log(expObj)
                             }
                         } else {
                             // single role with description
@@ -148,6 +162,7 @@ function extractExperience() {
     
                 expArray.push(expObj);
             }
+            console.log(expArray)
             return expArray;
         } else {
             // no div with exp = no experience details provided
@@ -168,7 +183,7 @@ function extractEducation() {
         const eduSection = divWithEdu.closest('section');
         const eduUl = eduSection.querySelector('ul.pvs-list');
         const eduArray = [];
-        const eduLi = eduUl.querySelectorAll('li.artdeco-list__item.qiKsLKoCUWtHqyagDivfYcjmKwgXlGodspDy.TPbZDJYZHPlKCdaCvYdpSYAYPoBvcsnjmfxA');
+        const eduLi = eduUl.querySelectorAll('li.artdeco-list__item');
 
         for (let i = 0; i < eduLi.length; i++) {
             const li = eduLi[i];
@@ -214,7 +229,7 @@ function extractVolunteering() {
     if (divWithVol) {
         const volSection = divWithVol.closest('section');
         const volUl = volSection.querySelector('ul.pvs-list');
-        const volLi = volUl.querySelectorAll('li.artdeco-list__item.qiKsLKoCUWtHqyagDivfYcjmKwgXlGodspDy.TPbZDJYZHPlKCdaCvYdpSYAYPoBvcsnjmfxA');
+        const volLi = volUl.querySelectorAll('li.artdeco-list__item');
         const volArray = [];
 
         for (let i = 0; i < volLi.length; i++) {
@@ -264,7 +279,7 @@ function extractProjects() {
         if (divWithProj) {
             const projSection = divWithProj.closest('section');
             const projUl = projSection.querySelector('ul.pvs-list');
-            const projLi = projUl.querySelectorAll('li.artdeco-list__item.qiKsLKoCUWtHqyagDivfYcjmKwgXlGodspDy.TPbZDJYZHPlKCdaCvYdpSYAYPoBvcsnjmfxA');
+            const projLi = projUl.querySelectorAll('li.artdeco-list__item');
             const projArray = [];
     
             for (let i = 0; i < projLi.length; i++) {
@@ -314,7 +329,7 @@ function extractSkills() {
         const skillsSection = divWithSkills.closest('section');
         const skillsArray = []
         const skillsUl = skillsSection.querySelector('ul.pvs-list')
-        const skillsLi = skillsUl.querySelectorAll('li.artdeco-list__item.qiKsLKoCUWtHqyagDivfYcjmKwgXlGodspDy.TPbZDJYZHPlKCdaCvYdpSYAYPoBvcsnjmfxA')
+        const skillsLi = skillsUl.querySelectorAll('li.artdeco-list__item')
         for (let i = 0; i < skillsLi.length; i++) {
             const li = skillsLi[i]
             const title = li.querySelector('div.display-flex.align-items-center.mr1.t-bold')
@@ -339,7 +354,7 @@ function extractHA() {
     if (divWithHA) {
         const HASection = divWithHA.closest('section');
         const HAUl = HASection.querySelector('ul.pvs-list');
-        const HALi = HAUl.querySelectorAll('li.artdeco-list__item.qiKsLKoCUWtHqyagDivfYcjmKwgXlGodspDy.TPbZDJYZHPlKCdaCvYdpSYAYPoBvcsnjmfxA');
+        const HALi = HAUl.querySelectorAll('li.artdeco-list__item');
         const HAArray = [];
 
         for (let i = 0; i < HALi.length; i++) {
@@ -382,7 +397,7 @@ function extractCert() {
     if (divWithCert) {
         const certSection = divWithCert.closest('section');
         const certUl = certSection.querySelector('ul.pvs-list');
-        const certLi = certUl.querySelectorAll('li.artdeco-list__item.qiKsLKoCUWtHqyagDivfYcjmKwgXlGodspDy.TPbZDJYZHPlKCdaCvYdpSYAYPoBvcsnjmfxA');
+        const certLi = certUl.querySelectorAll('li.artdeco-list__item');
         const certArray = [];
 
         for (let i = 0; i < certLi.length; i++) {
