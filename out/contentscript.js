@@ -586,7 +586,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     extractedData: extractedData
                 })
             }).then(res => res.json()).then(data => fillContentEditableWithDummyText(data.message))
-        },200);
+        },300);
         //fillContentEditableWithDummyText();
     }
   
