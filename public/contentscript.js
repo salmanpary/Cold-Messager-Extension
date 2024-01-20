@@ -546,7 +546,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     console.log(button2);
   
     // Function to handle button click
-    function fillContentEditableWithDummyText() {
+    function fillContentEditableWithDummyText(message) {
       console.log("fillContentEditableWithDummyText called");
      
       const contentEditableDivNodelist = document.querySelectorAll('.msg-form__contenteditable');
@@ -558,12 +558,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
           const dummyText = 'Hello, this is dummy text!';
           
           // Set the inner HTML of the contenteditable div with the dummy text
-          const message=`<p>Hi ${extractedData["name"]},</p>
-          <p>Saw that you have worked at ${extractedData["experience"][0]?.company_name.split(' · ')[0].trim()}</p>
-         <p>Do you have an opening at ${extractedData["experience"][0]?.company_name.split(' · ')[0].trim()} for a full stack developer role?</p>
-          <p>Thank you</p>
-          `
-          contentEditableDiv.innerHTML = message;
+        //   const message=`<p>Hi ${extractedData["name"]},</p>
+        //   <p>Saw that you have worked at ${extractedData["experience"][0]?.company_name.split(' · ')[0].trim()}</p>
+        //  <p>Do you have an opening at ${extractedData["experience"][0]?.company_name.split(' · ')[0].trim()} for a full stack developer role?</p>
+        //   <p>Thank you</p>
+        //   `
+          contentEditableDiv.innerHTML = `<p>${message}<p/>`;
           
           // Optionally, you can also trigger an input event to notify any listeners
           const inputEvent = new Event('input', { bubbles: true });
@@ -577,8 +577,16 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         extractedData = Smiritifunction3();
         // Your custom logic for button click
         setTimeout(() => {
-          fillContentEditableWithDummyText()
-        },300);
+            fillContentEditableWithDummyText('Loading...')
+            console.log('reqqq')
+            fetch('https://gmuf2naldzuc4nxlduhu4bnmce0lbfbn.lambda-url.eu-north-1.on.aws/',{
+                method: "POST",
+                body: JSON.stringify({
+                    uid: "WIknTUSSunQtmQbFPsgaLhKY98B3",
+                    extractedData: extractedData
+                })
+            }).then(res => res.json()).then(data => fillContentEditableWithDummyText(data.message))
+        },200);
         //fillContentEditableWithDummyText();
     }
   
