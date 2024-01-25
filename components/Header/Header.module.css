@@ -1,7 +1,13 @@
 .head {
     display: flex;
-    justify-content: center;
-    width: 400px;
+    justify-content: flex-start;
     font-size: medium;
     color: #757bc3;
+}
+
+.navbar {
+    width: 400px;
+    padding: 4px 10px;
+    display: flex;
+    justify-content: space-between;
 }
