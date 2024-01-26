@@ -1,23 +1,35 @@
 import styles from './Footer.module.css';
+import { FaLinkedin, FaTwitter, FaInstagram } from "react-icons/fa";
+import Link from 'next/link'
 
 export default function Footer() {
   return (
     <footer className={styles.footer}>
-      <a
-        href="https://github.com/ibnzUK/next-chrome-starter"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Footer V.0.0.1
-        <span className={styles.logo}>
-          <img
-            src="icons/icon16.png"
-            alt="Logo"
-            width={16}
-            height={16}
-          />
-        </span>
-      </a>
+      <h5>&copy; Cold Messager</h5>
+
+      <div className={styles.footer__iconscontainer}>
+          {/* LinkedIn Icon */}
+          <Link
+            href="https://www.linkedin.com/company/cold-messager/?lipi=urn%3Ali%3Apage%3Ad_flagship3_search_srp_companies%3BXVyiHlHhQL%2BQNt7Mz9jsEQ%3D%3D"
+            className={styles.footer__icons}
+          >
+            <FaLinkedin className={styles.footer__icons_icon} />
+          </Link>
+          {/* Twitter Icon */}
+          <Link
+            href="https://twitter.com/ColdM13955"
+            className={styles.footer__icons}
+          >
+            <FaTwitter className={styles.footer__icons_icon} />
+          </Link>
+          {/* Instagram Icon */}
+          <Link
+            href="https://www.instagram.com/coldmessager/"
+            className={styles.footer__icons}
+          >
+            <FaInstagram className={styles.footer__icons_icon} />
+          </Link>
+        </div>
     </footer>
   );
 }

@@ -1,13 +1,15 @@
-.head {
-    display: flex;
-    justify-content: flex-start;
-    font-size: medium;
-    color: #757bc3;
-}
-
 .navbar {
     width: 400px;
     padding: 4px 10px;
     display: flex;
     justify-content: space-between;
+    background-color: #fefcf3;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    z-index: 50;
+    position: fixed;
+    top:0;
+}
+
+.navbar__profileimage {
+    border-radius: 100%;
 }

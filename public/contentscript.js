@@ -1,3 +1,9 @@
+if (window.location.href.includes("www.coldmessager.com")) {
+    var webLocalStorage = window.localStorage;
+    var user = webLocalStorage.getItem("user");  
+    chrome.runtime.sendMessage({ user: user });
+}
+
 function extractExperience() {
     try{
         console.log('Extract experience function called');
@@ -533,6 +539,7 @@ console.log(extractedData);
 }
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "runContentScript") {
+    const user = JSON.parse(request.user.user)
     let extractedData;
     // setTimeout(() => {
     //   extractedData= Smiritifunction3();
@@ -582,7 +589,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             fetch('https://gmuf2naldzuc4nxlduhu4bnmce0lbfbn.lambda-url.eu-north-1.on.aws/',{
                 method: "POST",
                 body: JSON.stringify({
-                    uid: "WIknTUSSunQtmQbFPsgaLhKY98B3",
+                    email: user.email,
                     extractedData: extractedData
                 })
             }).then(res => res.json()).then(data => fillContentEditableWithDummyText(data.message))
