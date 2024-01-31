@@ -3,12 +3,21 @@ if (window.location.href.includes("www.coldmessager.com")) {
     var user = webLocalStorage.getItem("user");  
     chrome.runtime.sendMessage({ user: user });
 }
-
+function extractCompanyName(companyName) {
+    // Check if the center symbol is present in the company name
+    const centerSymbolIndex = companyName.indexOf("·");
+  
+    if (centerSymbolIndex !== -1) {
+      // If the center symbol is present, get the left part before the symbol
+      return companyName.substring(0, centerSymbolIndex).trim();
+    } else {
+      // If the center symbol is not present, return the original company name
+      return companyName.trim();
+    }
+  }
 function extractExperience() {
     try{
-        console.log('Extract experience function called');
         const divWithExp = document.querySelector('div#experience');
-        console.log(divWithExp, 'divWithExp');
         if (divWithExp) {
             const expSection = divWithExp.closest('section');
             const expUl = expSection.querySelector('ul.pvs-list');
@@ -36,7 +45,7 @@ function extractExperience() {
                         const bulletinSpan = listDiv.querySelector('span.pvs-entity__path-node');
     // multiple roles, location and duration both provided
                         if (bulletinSpan && locationSpan && durationSpan) {
-                            expObj['company_name'] = mainDiv.querySelector('span.visually-hidden').innerText.trim();
+                            expObj['company_name'] = extractCompanyName(mainDiv.querySelector('span.visually-hidden').innerText.trim());
                             expObj['location'] = durationSpan.querySelector('span.visually-hidden').innerText.trim();
                             expObj['duration'] = locationSpan.querySelector('span.visually-hidden').innerText.trim();
     
@@ -77,13 +86,12 @@ function extractExperience() {
                                 expObj['roles'] = roles;
                             }
                         } else if ((bulletinSpan && locationSpan) || (bulletinSpan && durationSpan)) {
-                            expObj['company_name'] = mainDiv.querySelector('span.visually-hidden').innerText.trim();
+                            expObj['company_name'] = extractCompanyName(mainDiv.querySelector('span.visually-hidden').innerText.trim());
                             expObj['primary_info'] = (locationSpan) ? { 'duration': locationSpan.querySelector('span.visually-hidden').innerText.trim() } : { 'location': durationSpan.querySelector('span.visually-hidden').innerText.trim() };
     // incase of multiple roles, location spam and duration span intercahnges
     
                             const roles = [];
                             const multipleRolesLi = listDiv.querySelectorAll('li');
-                            console.log(multipleRolesLi)
 
                             try{
                                 for (let j = 0; j < multipleRolesLi.length; j++) {
@@ -95,7 +103,6 @@ function extractExperience() {
                                         const roleDescriptionDiv = currRole.querySelector('div.pvs-list__outer-container.pvs-entity__sub-components');
                                         roleObj['role'] = roleTitle.querySelector('span.visually-hidden').innerText.trim();
                                         roleObj['duration'] = roleDuration.querySelector('span.visually-hidden').innerText.trim();
-                                        console.log('reldesc')
                                         if (roleDescriptionDiv) {
                                             const roleDescriptionUl = roleDescriptionDiv.querySelector('ul');
                                             const roleDescriptionLi = roleDescriptionUl.querySelectorAll('li');
@@ -122,14 +129,13 @@ function extractExperience() {
 
                             if (roles.length > 0) {
                                 expObj['roles'] = roles;
-                                console.log(expObj)
                             }
                         } else {
                             // single role with description
                             // single role, location span = company name
                             expObj['role'] = mainDiv.querySelector('span.visually-hidden').innerText.trim();
                             if(locationSpan){
-                                expObj['company_name'] = locationSpan.querySelector('span.visually-hidden').innerText.trim();
+                                expObj['company_name'] = extractCompanyName( locationSpan.querySelector('span.visually-hidden').innerText.trim());
                             }
                            if( durationSpan ){
                             expObj['duration'] = durationSpan.querySelector('span.visually-hidden').innerText.trim();
@@ -157,7 +163,7 @@ function extractExperience() {
                         // no listdiv = no extra details provided except the titile part
                         expObj['role'] = mainDiv.querySelector('span.visually-hidden').innerText.trim();
                         if(locationSpan){
-                            expObj['company_name'] = locationSpan.querySelector('span.visually-hidden').innerText.trim();
+                            expObj['company_name'] = extractCompanyName(locationSpan.querySelector('span.visually-hidden').innerText.trim());
                         }
                        if( durationSpan ){
                         expObj['duration'] = durationSpan.querySelector('span.visually-hidden').innerText.trim();
@@ -172,7 +178,7 @@ function extractExperience() {
             return expArray;
         } else {
             // no div with exp = no experience details provided
-            console.log('No experience details provided');
+        
         }
 
     }catch(e){
@@ -461,38 +467,37 @@ const extractExperience2 = () => {
 
             if (experienceDiv) {
                 // Call the function to process the content within the found outer container div
-                console.log(outerContainerDiv, 'outerContainerDiv');
+            
                 const ulElement = outerContainerDiv.querySelector('ul.pvs-list');
                 const expLi = ulElement.querySelectorAll('li.artdeco-list__item.qiKsLKoCUWtHqyagDivfYcjmKwgXlGodspDy.TPbZDJYZHPlKCdaCvYdpSYAYPoBvcsnjmfxA');
 
                 for (let i = 0; i < expLi.length; i++) {
                     const li = expLi[i];
-                    console.log(li, 'li');
+       
                     const insideDiv = li.querySelector('.ppsZsJKymLFlJUSOceObOsHEYkrXkSuVhVQg.pvs-entity--padded.JvHHhNIExyEKobNUWiOPChZtcnCYXSDmw');
-                    console.log(insideDiv, 'insideDiv');
+
 
                     // Extract the href of the a tag inside the first div (insideDiv)
                     const aTag = insideDiv.querySelector('a');
                     if (aTag) {
                         const hrefValue = aTag.getAttribute('href');
-                        console.log(hrefValue, 'hrefValue');
+                  
                     }
 
                     const detailsDiv = insideDiv.querySelector('.display-flex.flex-column.full-width.align-self-center');
-                    console.log(detailsDiv, 'detailsDiv');
+               
 
                     const companyNameAndTotalExperience = detailsDiv.querySelector('.display-flex.flex-row.justify-space-between');
                     const companyATag = companyNameAndTotalExperience.querySelector('a');
                     const companyLink = companyATag.getAttribute('href');
-                    console.log(companyLink, 'companyLink');
+        
 
                     const companyName = companyATag.querySelector('span').textContent.trim(); // Extracting company name
-                    console.log(companyName, 'companyName');
-
+                 
                     const totalYearsElement = companyNameAndTotalExperience.querySelector('span.t-14.t-normal');
                     const totalYears=totalYearsElement?totalYearsElement.querySelector('span').textContent.trim():''; // Extracting total years
                     // const totalYears = totalYearsElement ? totalYearsElement.textContent.trim() : ''; // Extracting total years
-                    console.log(totalYears, 'totalYears');
+                    
                 }
             }
         });
@@ -531,7 +536,7 @@ const Smiritifunction3 = () => {
   };
 
 
-console.log(extractedData);
+
   
   return extractedData;
  
@@ -550,15 +555,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     const button2 = document.querySelector(
       ".artdeco-button.artdeco-button--2.artdeco-button--secondary.ember-view.pvs-profile-actions__action"
     );
-    console.log(button2);
   
     // Function to handle button click
     function fillContentEditableWithDummyText(message) {
-      console.log("fillContentEditableWithDummyText called");
      
       const contentEditableDivNodelist = document.querySelectorAll('.msg-form__contenteditable');
       const contentEditableDiv = contentEditableDivNodelist.item(contentEditableDivNodelist.length -1 );
-      console.log(contentEditableDiv);
       
         if (contentEditableDiv) {
           // Replace this with your desired dummy text
@@ -580,12 +582,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     }
     
     function handleButtonClick() {
-        console.log("Button clicked!");
         extractedData = Smiritifunction3();
         // Your custom logic for button click
         setTimeout(() => {
             fillContentEditableWithDummyText('Loading...')
-            console.log('reqqq')
+         
             fetch('https://gmuf2naldzuc4nxlduhu4bnmce0lbfbn.lambda-url.eu-north-1.on.aws/',{
                 method: "POST",
                 body: JSON.stringify({
@@ -603,12 +604,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   
       // Check if button1 has the expected text
       if (buttonTextSpan && buttonTextSpan.textContent.trim() === "Message") {
-        console.log('Button 1 with text "Message" found!');
   
         // Add click event listener to button1
         button.addEventListener("click", handleButtonClick);
       } else {
-        console.log("Button 1 does not contain the expected text");
         if (button2) {
           const buttonTextSpan = button2.querySelector(
             ".artdeco-button__text"
@@ -619,17 +618,17 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             buttonTextSpan &&
             buttonTextSpan.textContent.trim() === "Message"
           ) {
-            console.log('Button 2 with text "Message" found!');
+
   
             // Add click event listener to button2
             button2.addEventListener("click", handleButtonClick);
           } else {
-            console.log("Button 2 does not contain the expected text");
+          
           }
         }
       }
     } else {
-      console.log("Buttons not found");
+
     }
   }
 });
