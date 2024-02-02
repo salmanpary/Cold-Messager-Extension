@@ -48,7 +48,10 @@ function extractExperience() {
                             expObj['company_name'] = extractCompanyName(mainDiv.querySelector('span.visually-hidden').innerText.trim());
                             expObj['location'] = durationSpan.querySelector('span.visually-hidden').innerText.trim();
                             expObj['duration'] = locationSpan.querySelector('span.visually-hidden').innerText.trim();
-    
+                            expObj['primary_info'] = {'duration': locationSpan.querySelector('span.visually-hidden').innerText.trim() ,
+                                                    'location': durationSpan.querySelector('span.visually-hidden').innerText.trim()
+                                                    };
+                            
                             const roles = [];
                             const multipleRolesLi = listDiv.querySelectorAll('li');
                             for (let j = 0; j < multipleRolesLi.length; j++) {
@@ -133,12 +136,15 @@ function extractExperience() {
                         } else {
                             // single role with description
                             // single role, location span = company name
-                            expObj['role'] = mainDiv.querySelector('span.visually-hidden').innerText.trim();
+                            const roles = []
+                            const roleObj = {}
+                            roleObj['role'] = mainDiv.querySelector('span.visually-hidden').innerText.trim();
+                            expObj['primary_info'] = {}
                             if(locationSpan){
                                 expObj['company_name'] = extractCompanyName( locationSpan.querySelector('span.visually-hidden').innerText.trim());
                             }
                            if( durationSpan ){
-                            expObj['duration'] = durationSpan.querySelector('span.visually-hidden').innerText.trim();
+                            expObj['primary_info']['duration'] = durationSpan.querySelector('span.visually-hidden').innerText.trim();
                            }
                             const roleDescriptionUl = listDiv.querySelector('ul.pvs-list');
                             const roleDescriptionLi = roleDescriptionUl.querySelectorAll('li');
@@ -154,7 +160,9 @@ function extractExperience() {
                                 }
             
                             }
-                            expObj['role_description'] = rDArray;
+                            roleObj['role_description'] = rDArray;
+                            roles.push(roleObj);
+                            expObj['roles'] = roles
                         }
                     }
                     else{
@@ -561,7 +569,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
      
       const contentEditableDivNodelist = document.querySelectorAll('.msg-form__contenteditable');
       const contentEditableDiv = contentEditableDivNodelist.item(contentEditableDivNodelist.length -1 );
-      
+        
         if (contentEditableDiv) {
           // Replace this with your desired dummy text
           const dummyText = 'Hello, this is dummy text!';
