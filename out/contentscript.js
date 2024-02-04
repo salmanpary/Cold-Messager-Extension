@@ -182,7 +182,7 @@ function extractExperience() {
     
                 expArray.push(expObj);
             }
-            console.log(expArray)
+         
             return expArray;
         } else {
             // no div with exp = no experience details provided
@@ -234,7 +234,7 @@ function extractEducation() {
 
         return eduArray;
     } else {
-        console.log('No education details provided');
+        
         return [];
     }
 }catch(e){
@@ -281,7 +281,7 @@ function extractVolunteering() {
 
         return volArray;
     } else {
-        console.log('No volunteering experience provided');
+       
         return [];
     }
 }catch(e){
@@ -332,7 +332,7 @@ function extractProjects() {
     
             return projArray;
         } else {
-            console.log('No projects added');
+           
             return [];
         }
     }catch(e){
@@ -358,7 +358,7 @@ function extractSkills() {
         return skillsArray
     }
     else {
-        console.log("No skills added")
+       
     }
 }catch(e){
     console.log(e)
@@ -401,7 +401,7 @@ function extractHA() {
 
         return HAArray;
     } else {
-        console.log("No awards added");
+       
         return [];
     }
 }catch(e){
@@ -450,7 +450,7 @@ function extractCert() {
 
         return certArray;
     } else {
-        console.log('No certifications');
+       
         return [];
     }
 }catch(e){
