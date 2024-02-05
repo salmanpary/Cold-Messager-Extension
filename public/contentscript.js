@@ -15,6 +15,18 @@ function extractCompanyName(companyName) {
       return companyName.trim();
     }
   }
+
+function extractDuration(duration){
+    const centerSymbolIndex = duration.indexOf("·");
+    let newDuration = duration
+    newDuration = newDuration.replace('yrs','years')
+    newDuration = newDuration.replace('mos','months')
+    if (centerSymbolIndex !== -1) {
+        return newDuration.substring(centerSymbolIndex+1).trim();
+    } else {
+        return newDuration.trim();
+    }
+}
 function extractExperience() {
     try{
         const divWithExp = document.querySelector('div#experience');
@@ -48,7 +60,7 @@ function extractExperience() {
                             expObj['company_name'] = extractCompanyName(mainDiv.querySelector('span.visually-hidden').innerText.trim());
                             expObj['location'] = durationSpan.querySelector('span.visually-hidden').innerText.trim();
                             expObj['duration'] = locationSpan.querySelector('span.visually-hidden').innerText.trim();
-                            expObj['primary_info'] = {'duration': locationSpan.querySelector('span.visually-hidden').innerText.trim() ,
+                            expObj['primary_info'] = {'duration': extractDuration(locationSpan.querySelector('span.visually-hidden').innerText.trim()) ,
                                                     'location': durationSpan.querySelector('span.visually-hidden').innerText.trim()
                                                     };
                             
@@ -62,7 +74,7 @@ function extractExperience() {
                                 if (roleTitle && roleDuration) {
                                     const roleDescriptionDiv = currRole.querySelector('div.pvs-list__outer-container.pvs-entity__sub-components');
                                     roleObj['role'] = roleTitle.querySelector('span.visually-hidden').innerText.trim();
-                                    roleObj['duration'] = roleDuration.querySelector('span.visually-hidden').innerText.trim();
+                                    roleObj['duration'] = extractDuration(roleDuration.querySelector('span.visually-hidden').innerText.trim())
     
                                     if (roleDescriptionDiv) {
                                         const roleDescriptionUl = roleDescriptionDiv.querySelector('ul');
@@ -90,7 +102,7 @@ function extractExperience() {
                             }
                         } else if ((bulletinSpan && locationSpan) || (bulletinSpan && durationSpan)) {
                             expObj['company_name'] = extractCompanyName(mainDiv.querySelector('span.visually-hidden').innerText.trim());
-                            expObj['primary_info'] = (locationSpan) ? { 'duration': locationSpan.querySelector('span.visually-hidden').innerText.trim() } : { 'location': durationSpan.querySelector('span.visually-hidden').innerText.trim() };
+                            expObj['primary_info'] = (locationSpan) ? { 'duration': extractDuration(locationSpan.querySelector('span.visually-hidden').innerText.trim()) } : { 'location': durationSpan.querySelector('span.visually-hidden').innerText.trim() };
     // incase of multiple roles, location spam and duration span intercahnges
     
                             const roles = [];
@@ -105,7 +117,7 @@ function extractExperience() {
                                     if (roleTitle && roleDuration) {
                                         const roleDescriptionDiv = currRole.querySelector('div.pvs-list__outer-container.pvs-entity__sub-components');
                                         roleObj['role'] = roleTitle.querySelector('span.visually-hidden').innerText.trim();
-                                        roleObj['duration'] = roleDuration.querySelector('span.visually-hidden').innerText.trim();
+                                        roleObj['duration'] = extractDuration(roleDuration.querySelector('span.visually-hidden').innerText.trim());
                                         if (roleDescriptionDiv) {
                                             const roleDescriptionUl = roleDescriptionDiv.querySelector('ul');
                                             const roleDescriptionLi = roleDescriptionUl.querySelectorAll('li');
@@ -144,7 +156,7 @@ function extractExperience() {
                                 expObj['company_name'] = extractCompanyName( locationSpan.querySelector('span.visually-hidden').innerText.trim());
                             }
                            if( durationSpan ){
-                            expObj['primary_info']['duration'] = durationSpan.querySelector('span.visually-hidden').innerText.trim();
+                            expObj['primary_info']['duration'] = extractDuration(durationSpan.querySelector('span.visually-hidden').innerText.trim());
                            }
                             const roleDescriptionUl = listDiv.querySelector('ul.pvs-list');
                             const roleDescriptionLi = roleDescriptionUl.querySelectorAll('li');
@@ -174,7 +186,7 @@ function extractExperience() {
                             expObj['company_name'] = extractCompanyName(locationSpan.querySelector('span.visually-hidden').innerText.trim());
                         }
                        if( durationSpan ){
-                        expObj['duration'] = durationSpan.querySelector('span.visually-hidden').innerText.trim();
+                        expObj['duration'] = extractDuration(durationSpan.querySelector('span.visually-hidden').innerText.trim())
                        }
                     }
                 }
