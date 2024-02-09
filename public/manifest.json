@@ -18,8 +18,7 @@
   "content_scripts": [
     {
       "matches": [
-        "https://*.linkedin.com/*",
-        "https://*.coldmessager.com/*"
+        "https://*.linkedin.com/*"
       ],
       "js": ["contentscript.js"]
     }
