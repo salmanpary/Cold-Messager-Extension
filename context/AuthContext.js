@@ -13,6 +13,7 @@ export const AuthContextProvider = ({children}) => {
     const logOutUser = () => {
         setUser(null)
         chrome.storage.local.remove(['user'])
+        chrome.tabs.reload();
     }
 
     return (

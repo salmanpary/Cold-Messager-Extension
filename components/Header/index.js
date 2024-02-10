@@ -76,6 +76,7 @@ export default function Header() {
             color="inherit"
             sx={{ fontSize: 18, fontWeight: 600, textTransform: "none",color:"#ff40a5" }}
             startIcon={<GoogleIcon sx={{fontSize:18,color:"#ff40a5"}}/>}
+            onClick={() => chrome.tabs.reload()}
           >
           Login
         </Button>
