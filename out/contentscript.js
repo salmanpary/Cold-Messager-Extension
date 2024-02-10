@@ -610,7 +610,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             fetch('https://gmuf2naldzuc4nxlduhu4bnmce0lbfbn.lambda-url.eu-north-1.on.aws/',{
                 method: "POST",
                 body: JSON.stringify({
-                    id: `${Date.now()+'_'+Math.random().toString(36).substring(2)}`,
                     email: user.email,
                     extractedData: extractedData
                 })
