@@ -8,7 +8,7 @@ export const AuthContextProvider = ({children}) => {
     useEffect(() => {
         chrome.storage.local.get(["user"])
         .then(data => {
-            if (user) {
+            if (data.user) {
                 setUser(JSON.parse(data.user))
             }
         })
