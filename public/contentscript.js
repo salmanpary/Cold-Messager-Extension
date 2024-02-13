@@ -564,6 +564,7 @@ const Smiritifunction3 = () => {
 }
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "runContentScript") {
+    sendResponse({ success: true });
     const user = JSON.parse(request.user.user)
     let extractedData;
     // setTimeout(() => {
@@ -603,6 +604,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     
     function handleButtonClick() {
         extractedData = Smiritifunction3();
+        console.log('handle button click called')
         // Your custom logic for button click
         setTimeout(() => {
             fillContentEditableWithDummyText('Loading...')
