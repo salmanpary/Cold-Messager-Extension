@@ -1,12 +1,38 @@
 chrome?.webNavigation?.onDOMContentLoaded?.addListener(function (details) {
+  if (!details.url.includes("linkedin.com")) {
+    // Skip sending messages if not from LinkedIn domain
+    // otherwise will lead to connection not established error
+    // that error came because we sent messages to tabs without checking where they come from. so we kept on sending messages even if that is chrome://extension or coldmessager which is not designed to respond to our request
+    // we included this check in details itself because a few linkedin tabs didnt have url property whereas in details, url was always seen
+    return;
+  }
+
+  console.log(details);
+
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    chrome?.storage?.local?.get(["user"])?.then(data => {
-      let user = data
-      if (!user) user={}
-      chrome.tabs.sendMessage(tabs[0].id, { action: "runContentScript" , user: user})
-    }).catch(err => console.log(err))
+    tabs.forEach(element => {
+      console.log(element);
+    });
+
+    if (tabs[0] && tabs[0].status === "complete") {
+      chrome?.storage?.local?.get(["user"])?.then(data => {
+        let user = data;
+        if (!user) user = {};
+        
+        chrome.tabs.sendMessage(tabs[0].id, { action: "runContentScript", user: user }, function () {
+          console.log(`message sent to ${tabs[0].id}`);
+        });
+      }).catch((err) => {
+        console.error(err);
+        console.log(`error sending message to ${tabs[0].id}`);
+      });
+    } else {
+      console.log("Tab status is not complete. Message not sent.");  // to prevent multiple calls
+    }
   });
 });
+
+
 
 chrome.runtime.onMessage.addListener(
 async function(request, sender, sendResponse) {
