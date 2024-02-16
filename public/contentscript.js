@@ -3,6 +3,10 @@ if (window.location.href.includes("www.coldmessager.com")) {
     var user = webLocalStorage.getItem("user");  
     chrome.runtime.sendMessage({ user: user });
 }
+
+
+
+
 function extractCompanyName(companyName) {
     // Check if the center symbol is present in the company name
     const centerSymbolIndex = companyName.indexOf("·");
@@ -570,12 +574,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     // setTimeout(() => {
     //   extractedData= Smiritifunction3();
     // }, 1000);
+    
     const button = document.querySelector(
       ".artdeco-button.artdeco-button--2.artdeco-button--primary.ember-view.pvs-profile-actions__action"
     );
     const button2 = document.querySelector(
       ".artdeco-button.artdeco-button--2.artdeco-button--secondary.ember-view.pvs-profile-actions__action"
     );
+    
   
     // Function to handle button click
     function fillContentEditableWithDummyText(message) {
@@ -604,7 +610,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     
     function handleButtonClick() {
         extractedData = Smiritifunction3();
-        console.log('handle button click called')
         // Your custom logic for button click
         setTimeout(() => {
             fillContentEditableWithDummyText('Loading...')
