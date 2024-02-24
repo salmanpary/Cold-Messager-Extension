@@ -558,23 +558,24 @@ const Smiritifunction3 = () => {
       'licenses_and_certifications': extractCert(),
     //   'experience2':extractExperience2(),
   };
-
-
-
-  
   return extractedData;
- 
-  
 }
+
+
+  // bulk messaging related
+  let index = -1;
+  let insideBulk = false;
+  let connectionsLiArray
+  let sendButton
+  let closeMessage
+  let parentButton
+
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "runContentScript") {
     sendResponse({ success: true });
+    console.log(`content script ran  with insideBulk: ${insideBulk}`)
     const user = JSON.parse(request.user.user)
     let extractedData;
-    // setTimeout(() => {
-    //   extractedData= Smiritifunction3();
-    // }, 1000);
-    
     const button = document.querySelector(
       ".artdeco-button.artdeco-button--2.artdeco-button--primary.ember-view.pvs-profile-actions__action"
     );
@@ -585,7 +586,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   
     // Function to handle button click
     function fillContentEditableWithDummyText(message) {
-     
+     console.log(`fill content with message called :${message}`)
       const contentEditableDivNodelist = document.querySelectorAll('.msg-form__contenteditable');
       const contentEditableDiv = contentEditableDivNodelist.item(contentEditableDivNodelist.length -1 );
         
@@ -609,6 +610,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     }
     
     function handleButtonClick() {
+        console.log('inside handle button click')
         extractedData = Smiritifunction3();
         // Your custom logic for button click
         setTimeout(() => {
@@ -620,7 +622,24 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     email: user.email,
                     extractedData: extractedData
                 })
-            }).then(res => res.json()).then(data => fillContentEditableWithDummyText(data.message))
+            }).then(res => res.json()).then((data) => {
+                fillContentEditableWithDummyText(data.message)
+              if(insideBulk){
+                sendButton = document.querySelector(".msg-form__send-button.artdeco-button.artdeco-button--1");
+                console.log(`send button is ${sendButton}`)
+                sendButton.click()
+                console.log('MESSAGE SENT')
+                let i = 1000000
+                setTimeout(function () {
+                    closeMessage = document.querySelector('svg[data-test-icon="close-small"]');
+                    parentButton = closeMessage.closest('button');
+                    console.log(`close message button is ${parentButton}`)
+                    parentButton.click()
+                    console.log('MESSAGE BOX CLOSED')
+                    window.history.back()
+                }, 5000); // 5000 milliseconds = 5 seconds
+              }
+            })
         },300);
         //fillContentEditableWithDummyText();
     }
@@ -649,13 +668,79 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   
             // Add click event listener to button2
             button2.addEventListener("click", handleButtonClick);
-          } else {
-          
           }
         }
       }
-    } else {
+    } 
 
+
+
+
+
+
+  
+
+// bulk messaging related
+
+
+function autoMessage() {
+    console.log('automessage function called')
+    if (button) {
+        console.log('found button')
+        const buttonTextSpan = button.querySelector(".artdeco-button__text");
+        if (buttonTextSpan && buttonTextSpan.textContent.trim() === "Message") {
+            button.click();
+            console.log('Button 1 clicked');
+        } else if (button2) {
+            console.log('found button 2')
+            const buttonTextSpan2 = button2.querySelector(".artdeco-button__text");
+            if (buttonTextSpan2 && buttonTextSpan2.textContent.trim() === "Message") {
+                button2.click();
+                console.log('Button 2 clicked');
+            }
+        }
+    } else {
+        console.log('button and button2 not found');
     }
+}
+
+if (insideBulk) {
+    console.log('inside bulk has been set to true to do automessage');
+    autoMessage()
+}
+
+const performBulkMessaging = (index) => {
+    console.log(`performing bulk messaging called with index ${index}`);
+    console.log(connectionsLiArray);
+    if (connectionsLiArray.length <= index) {
+        console.log('All connections have been messaged');
+        insideBulk = false;
+        return;
+    }
+    const aTag = connectionsLiArray[index].querySelector('a');
+    console.log(connectionsLiArray);
+    if (aTag) {
+        insideBulk = true;
+        console.log('Clicking A tag');
+        aTag.click();
+    } else {
+        console.log('No "a" tag within the li element');
+    }
+};
+
+if (window.location.href === "https://www.linkedin.com/mynetwork/invite-connect/connections/") {
+    const connectionsUlDiv = document.querySelector('div.scaffold-finite-scroll.scaffold-finite-scroll--infinite');
+    if (connectionsUlDiv) {
+        const connectionsLi = connectionsUlDiv.getElementsByTagName('li');
+        connectionsLiArray = Array.from(connectionsLi);
+        console.log(connectionsLiArray.length);
+        console.log(index);
+        setTimeout(() => {
+            performBulkMessaging(++index);
+        }, 1000);
+    } else {
+        console.log('No div with connections list');
+    }
+}
   }
 });

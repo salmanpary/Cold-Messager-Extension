@@ -15,6 +15,7 @@ chrome?.webNavigation?.onDOMContentLoaded?.addListener(function (details) {
         let user = data;
         if (!user) user = {};
         chrome.tabs.sendMessage(tabs[0].id, { action: "runContentScript", user: user });
+        console.log(`sent message to ${details.url}`)
       }).catch((err) => {
         console.error(err);
       });
