@@ -568,7 +568,8 @@ const Smiritifunction3 = () => {
 }
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "runContentScript") {
-    sendResponse({ success: true });
+    console.log('received message to run content script')
+    try{ 
     const user = JSON.parse(request.user.user)
     let extractedData;
     // setTimeout(() => {
@@ -582,37 +583,45 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       ".artdeco-button.artdeco-button--2.artdeco-button--secondary.ember-view.pvs-profile-actions__action"
     );
     
-  
-    // Function to handle button click
-    function fillContentEditableWithDummyText(message) {
-     
-      const contentEditableDivNodelist = document.querySelectorAll('.msg-form__contenteditable');
-      const contentEditableDiv = contentEditableDivNodelist.item(contentEditableDivNodelist.length -1 );
-        
-        if (contentEditableDiv) {
-          // Replace this with your desired dummy text
-          const dummyText = 'Hello, this is dummy text!';
-          
-          // Set the inner HTML of the contenteditable div with the dummy text
-        //   const message=`<p>Hi ${extractedData["name"]},</p>
-        //   <p>Saw that you have worked at ${extractedData["experience"][0]?.company_name.split(' · ')[0].trim()}</p>
-        //  <p>Do you have an opening at ${extractedData["experience"][0]?.company_name.split(' · ')[0].trim()} for a full stack developer role?</p>
-        //   <p>Thank you</p>
-        //   `
-          contentEditableDiv.innerHTML = `<p>${message}<p/>`;
-          
+    
+
+
+    function fillContentEditableWithDummyText(message, contentBox) {
+        console.log('fill content called')
+        if(contentBox.tagName.toLowerCase() === 'textarea'){
+            contentBox.value = message
+        }
+        else{
+            contentBox.innerHTML = `<p>${message}<p/>`;
+        }
           // Optionally, you can also trigger an input event to notify any listeners
           const inputEvent = new Event('input', { bubbles: true });
-          contentEditableDiv.dispatchEvent(inputEvent);
-        }
-   
+          contentBox.dispatchEvent(inputEvent);
     }
     
     function handleButtonClick() {
+        console.log('handle button click called')
+        // either we perform normal messaging or personalised connection messages. so only 1 content div would be present at a time
+        // whichever is present, we will assign it to the contentEditableDiv variable and pass it to fillMessage() funciton
+    let contentEditableDiv;
+        const contentEditableDivNodelist = document.querySelectorAll('.msg-form__contenteditable');  // for normal messaging
+        setTimeout( () =>{
+            const addNoteMessageArea = document.querySelector('.connect-button-send-invite__custom-message');  // for add note connections
+            console.log(addNoteMessageArea)
+            if(addNoteMessageArea !== null){
+                contentEditableDiv = addNoteMessageArea
+                console.log('content editable div set to add note')
+            }
+        }, 500)
+        console.log(contentEditableDivNodelist)
+        if(contentEditableDivNodelist !== null && contentEditableDivNodelist.length !== 0 ){
+            contentEditableDiv= contentEditableDivNodelist.item(contentEditableDivNodelist.length -1 );  // for normal messaging
+            console.log('content editable div set to normal messaging content')
+        }
         extractedData = Smiritifunction3();
         // Your custom logic for button click
         setTimeout(() => {
-            fillContentEditableWithDummyText('Loading...')
+            fillContentEditableWithDummyText('Loading...', contentEditableDiv)
          
             fetch('https://gmuf2naldzuc4nxlduhu4bnmce0lbfbn.lambda-url.eu-north-1.on.aws/',{
                 method: "POST",
@@ -620,18 +629,20 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     email: user.email,
                     extractedData: extractedData
                 })
-            }).then(res => res.json()).then(data => fillContentEditableWithDummyText(data.message))
-        },300);
+            }).then(res => res.json()).then(data => fillContentEditableWithDummyText(data.message, contentEditableDiv))
+        },700);
         //fillContentEditableWithDummyText();
     }
-  
+
+
+
+
+    
     // Check if button1 exists
     if (button) {
       const buttonTextSpan = button.querySelector(".artdeco-button__text");
-  
       // Check if button1 has the expected text
       if (buttonTextSpan && buttonTextSpan.textContent.trim() === "Message") {
-  
         // Add click event listener to button1
         button.addEventListener("click", handleButtonClick);
       } else {
@@ -639,14 +650,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
           const buttonTextSpan = button2.querySelector(
             ".artdeco-button__text"
           );
-  
           // Check if button2 has the expected text
           if (
             buttonTextSpan &&
             buttonTextSpan.textContent.trim() === "Message"
           ) {
-
-  
             // Add click event listener to button2
             button2.addEventListener("click", handleButtonClick);
           } else {
@@ -655,7 +663,74 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         }
       }
     } else {
-
     }
+
+
+
+    
+
+    // PERSONALISED CONNECTION REQUEST RELATED
+//------------------------------------------------------------//
+
+const blueButtonStyle = {
+    backgroundColor: 'blue',
+    color: 'white',
+};
+
+// we can click on the connect button in the search results page as well as the profile page. If we click the connect button from the search results page, we need to navigate to the profiles page
+const connectButtonSearchList = document.querySelectorAll('.artdeco-button');
+console.log(connectButtonSearchList)
+// Filter the elements based on the presence of a child span with text "Connect"
+const filteredButtons = Array.from(connectButtonSearchList).filter(button => {
+    const spanElement = button.querySelector('.artdeco-button__text'); // Query the span directly
+    return spanElement && spanElement.textContent.trim().toLowerCase() === "connect";
+});
+console.log(filteredButtons.length);
+
+
+function connectHandler( connectButton){
+    try{
+        console.log('connect handler called')
+    // if we click any of the filtered buttons, we need to check if we are in the search results url or the profiles url or did we find this profile on the right side of someone else's profile
+    if(window.location.href.toLowerCase().includes("https://www.linkedin.com/search/results")){
+        // if we are in the search results url, we need to navigate to the profile
+        const userProfileElement = connectButton.closest('.linked-area');
+        if(userProfileElement){
+            const closestTitleLine = userProfileElement.querySelector('.entity-result__title-text');
+            console.log(closestTitleLine)
+            if( closestTitleLine ){
+                closestTitleLine.click()
+                console.log('clicked the title to profile')
+            }
+        }
+    }
+    // we cannot add connection note if we are trying to connect with a profile whose recommendation is on the side of someone else's profile
+    const addNoteButton = document.querySelector('button[aria-label="Add a note"]');
+    console.log(addNoteButton)
+    if( addNoteButton ){
+        addNoteButton.addEventListener("click",handleButtonClick)
+        console.log(' add note button found and event handler attached')
+    }
+    }
+    catch(e){
+        console.log(`error in connect handler ${e}`)
+    }
+    
+}
+if( filteredButtons && filteredButtons.length > 0 ){
+    filteredButtons.forEach(button => {
+        button.addEventListener("click", () =>{
+            connectHandler(button)
+        });
+        Object.assign(button.style, blueButtonStyle);
+        console.log('connect buttons found and event handlers attached')
+      });
+}
+    sendResponse({ success: true });
+}
+catch(e){
+    console.log(`error in sending response: ${e}`)
+}
+
   }
 });
