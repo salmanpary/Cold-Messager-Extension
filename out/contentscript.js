@@ -474,76 +474,17 @@ function extractCert() {
     return []
 }
 }
-const extractExperience2 = () => {
-    try {
-        // Get the section with the specified class
-        const profileCardSections = document.querySelectorAll('.artdeco-card.pv-profile-card.break-words.mt2');
 
-        // Filter the sections that contain the "experience" div
-        const sectionsWithExperience = Array.from(profileCardSections).filter((profileCardSection) => {
-            const experienceDiv = profileCardSection.querySelector('#experience');
-            return experienceDiv !== null;
-        });
-
-        sectionsWithExperience.forEach((profileCardSection) => {
-            const experienceDiv = profileCardSection.querySelector('#experience');
-            const outerContainerDiv = profileCardSection.querySelector('.pvs-list__outer-container');
-
-            if (experienceDiv) {
-                // Call the function to process the content within the found outer container div
-            
-                const ulElement = outerContainerDiv.querySelector('ul.pvs-list');
-                const expLi = ulElement.querySelectorAll('li.artdeco-list__item.qiKsLKoCUWtHqyagDivfYcjmKwgXlGodspDy.TPbZDJYZHPlKCdaCvYdpSYAYPoBvcsnjmfxA');
-
-                for (let i = 0; i < expLi.length; i++) {
-                    const li = expLi[i];
-       
-                    const insideDiv = li.querySelector('.ppsZsJKymLFlJUSOceObOsHEYkrXkSuVhVQg.pvs-entity--padded.JvHHhNIExyEKobNUWiOPChZtcnCYXSDmw');
-
-
-                    // Extract the href of the a tag inside the first div (insideDiv)
-                    const aTag = insideDiv.querySelector('a');
-                    if (aTag) {
-                        const hrefValue = aTag.getAttribute('href');
-                  
-                    }
-
-                    const detailsDiv = insideDiv.querySelector('.display-flex.flex-column.full-width.align-self-center');
-               
-
-                    const companyNameAndTotalExperience = detailsDiv.querySelector('.display-flex.flex-row.justify-space-between');
-                    const companyATag = companyNameAndTotalExperience.querySelector('a');
-                    const companyLink = companyATag.getAttribute('href');
-        
-
-                    const companyName = companyATag.querySelector('span').textContent.trim(); // Extracting company name
-                 
-                    const totalYearsElement = companyNameAndTotalExperience.querySelector('span.t-14.t-normal');
-                    const totalYears=totalYearsElement?totalYearsElement.querySelector('span').textContent.trim():''; // Extracting total years
-                    // const totalYears = totalYearsElement ? totalYearsElement.textContent.trim() : ''; // Extracting total years
-                    
-                }
-            }
-        });
-    } catch (e) {
-        console.error(e);
-        return [];
-    }
-}
-const Smiritifunction3 = () => {
+const scrapingFunction = () => {
   const profileName = document.querySelector('.text-heading-xlarge').innerHTML
   const tagLine = document.querySelector('.text-body-medium').innerHTML.replace(/\s+/g, ' ').trim();
   const profileLocation = document.querySelector('.text-body-small.inline.t-black--light.break-words').innerHTML.replace(/\s+/g, ' ').trim()
   const description = document.querySelector('.pv-shared-text-with-see-more div:first-of-type span:first-child').innerText.replace(/\s+/g, ' ').trim()
-  extractExperience2()
   // there are multiple sections and each section has a div with Id section name but the content is not inside the div with that particular id
   // if there are no multiple roles, the main div would contain the role
   // if there were multiple roles, the main div would contain the company name
   // if there were multiple roles, there would be a span denoting the bulletin point in the listDiv
   // if there are multiple roles, location span and duration span interchanges
-
- 
-
   const extractedData = {
       'name': profileName,
       'bio': tagLine,
@@ -556,32 +497,20 @@ const Smiritifunction3 = () => {
       'top_skills': extractSkills(),
       'honors_and_awards': extractHA(),
       'licenses_and_certifications': extractCert(),
-    //   'experience2':extractExperience2(),
   };
-
-
-
-  
   return extractedData;
- 
-  
 }
+
+
+
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "runContentScript") {
     console.log('received message to run content script')
     try{ 
     const user = JSON.parse(request.user.user)
     let extractedData;
-    // setTimeout(() => {
-    //   extractedData= Smiritifunction3();
-    // }, 1000);
-    
-    const button = document.querySelector(
-      ".artdeco-button.artdeco-button--2.artdeco-button--primary.ember-view.pvs-profile-actions__action"
-    );
-    const button2 = document.querySelector(
-      ".artdeco-button.artdeco-button--2.artdeco-button--secondary.ember-view.pvs-profile-actions__action"
-    );
+   const button = document.querySelector(".artdeco-button.artdeco-button--2.artdeco-button--primary.ember-view.pvs-profile-actions__action");
+    const button2 = document.querySelector(".artdeco-button.artdeco-button--2.artdeco-button--secondary.ember-view.pvs-profile-actions__action");
     
     
 
@@ -599,66 +528,37 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
           contentBox.dispatchEvent(inputEvent);
     }
     
-    function handleButtonClick() {
-        console.log('handle button click called')
-        // either we perform normal messaging or personalised connection messages. so only 1 content div would be present at a time
-        // whichever is present, we will assign it to the contentEditableDiv variable and pass it to fillMessage() funciton
-    let contentEditableDiv;
-        const contentEditableDivNodelist = document.querySelectorAll('.msg-form__contenteditable');  // for normal messaging
-        setTimeout( () =>{
-            const addNoteMessageArea = document.querySelector('.connect-button-send-invite__custom-message');  // for add note connections
-            console.log(addNoteMessageArea)
-            if(addNoteMessageArea !== null){
-                contentEditableDiv = addNoteMessageArea
-                console.log('content editable div set to add note')
-            }
-        }, 500)
-        console.log(contentEditableDivNodelist)
-        if(contentEditableDivNodelist !== null && contentEditableDivNodelist.length !== 0 ){
-            contentEditableDiv= contentEditableDivNodelist.item(contentEditableDivNodelist.length -1 );  // for normal messaging
-            console.log('content editable div set to normal messaging content')
-        }
-        extractedData = Smiritifunction3();
-        // Your custom logic for button click
+    function handleMessageButtonClick() {
+        const contentEditableDivNodelist = document.querySelectorAll('.msg-form__contenteditable');  
+        const messageField = contentEditableDivNodelist.item(contentEditableDivNodelist.length -1 ); 
+        extractedData = scrapingFunction();
         setTimeout(() => {
-            fillContentEditableWithDummyText('Loading...', contentEditableDiv)
-         
+            fillContentEditableWithDummyText('Loading...', messageField)
             fetch('https://gmuf2naldzuc4nxlduhu4bnmce0lbfbn.lambda-url.eu-north-1.on.aws/',{
                 method: "POST",
                 body: JSON.stringify({
                     email: user.email,
                     extractedData: extractedData
                 })
-            }).then(res => res.json()).then(data => fillContentEditableWithDummyText(data.message, contentEditableDiv))
+            }).then(res => res.json()).then(data => fillContentEditableWithDummyText(data.message, messageField))
         },700);
-        //fillContentEditableWithDummyText();
     }
 
 
 
 
-    
-    // Check if button1 exists
+    // adding click handlers to the message buttons
     if (button) {
       const buttonTextSpan = button.querySelector(".artdeco-button__text");
       // Check if button1 has the expected text
       if (buttonTextSpan && buttonTextSpan.textContent.trim() === "Message") {
-        // Add click event listener to button1
-        button.addEventListener("click", handleButtonClick);
+        button.addEventListener("click", handleMessageButtonClick);
       } else {
         if (button2) {
-          const buttonTextSpan = button2.querySelector(
-            ".artdeco-button__text"
-          );
-          // Check if button2 has the expected text
-          if (
-            buttonTextSpan &&
-            buttonTextSpan.textContent.trim() === "Message"
-          ) {
-            // Add click event listener to button2
-            button2.addEventListener("click", handleButtonClick);
+          const buttonTextSpan = button2.querySelector(".artdeco-button__text");
+          if (buttonTextSpan && buttonTextSpan.textContent.trim() === "Message") {
+            button2.addEventListener("click", handleMessageButtonClick);
           } else {
-          
           }
         }
       }
@@ -672,21 +572,30 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     // PERSONALISED CONNECTION REQUEST RELATED
 //------------------------------------------------------------//
 
-const blueButtonStyle = {
-    backgroundColor: 'blue',
+const greenButtonStyle = {
+    backgroundColor: 'green',
     color: 'white',
 };
 
-// we can click on the connect button in the search results page as well as the profile page. If we click the connect button from the search results page, we need to navigate to the profiles page
-const connectButtonSearchList = document.querySelectorAll('.artdeco-button');
-console.log(connectButtonSearchList)
-// Filter the elements based on the presence of a child span with text "Connect"
-const filteredButtons = Array.from(connectButtonSearchList).filter(button => {
-    const spanElement = button.querySelector('.artdeco-button__text'); // Query the span directly
-    return spanElement && spanElement.textContent.trim().toLowerCase() === "connect";
-});
-console.log(filteredButtons.length);
 
+function handleAddNoteButtonClick(){
+    setTimeout( () =>{ // adding set timeout because the message field takes a bit time to load
+        const addNoteMessageArea = document.querySelector('.connect-button-send-invite__custom-message');  
+        if(addNoteMessageArea !== null){
+            extractedData = scrapingFunction();
+        setTimeout(() => {
+            fillContentEditableWithDummyText('Loading...', addNoteMessageArea)
+            fetch('https://gmuf2naldzuc4nxlduhu4bnmce0lbfbn.lambda-url.eu-north-1.on.aws/',{
+                method: "POST",
+                body: JSON.stringify({
+                    email: user.email,
+                    extractedData: extractedData
+                })
+            }).then(res => res.json()).then(data => fillContentEditableWithDummyText(data.message, addNoteMessageArea))
+        },700);
+        }
+    }, 500)
+}
 
 function connectHandler( connectButton){
     try{
@@ -697,7 +606,6 @@ function connectHandler( connectButton){
         const userProfileElement = connectButton.closest('.linked-area');
         if(userProfileElement){
             const closestTitleLine = userProfileElement.querySelector('.entity-result__title-text');
-            console.log(closestTitleLine)
             if( closestTitleLine ){
                 closestTitleLine.click()
                 console.log('clicked the title to profile')
@@ -706,10 +614,8 @@ function connectHandler( connectButton){
     }
     // we cannot add connection note if we are trying to connect with a profile whose recommendation is on the side of someone else's profile
     const addNoteButton = document.querySelector('button[aria-label="Add a note"]');
-    console.log(addNoteButton)
     if( addNoteButton ){
-        addNoteButton.addEventListener("click",handleButtonClick)
-        console.log(' add note button found and event handler attached')
+        addNoteButton.addEventListener("click",handleAddNoteButtonClick)
     }
     }
     catch(e){
@@ -717,20 +623,31 @@ function connectHandler( connectButton){
     }
     
 }
+
+
+
+// locating the connect buttons might take a bit time
+setTimeout( () => {
+// we can click on the connect button in the search results page as well as the profile page. If we click the connect button from the search results page, we need to navigate to the profiles page
+const connectButtonSearchList = document.querySelectorAll('.artdeco-button');
+// Filter the elements based on the presence of a child span with text "Connect"
+const filteredButtons = Array.from(connectButtonSearchList).filter(button => {
+    const spanElement = button.querySelector('.artdeco-button__text'); // Query the span directly
+    return spanElement && spanElement.textContent.trim().toLowerCase() === "connect";
+});
+
 if( filteredButtons && filteredButtons.length > 0 ){
     filteredButtons.forEach(button => {
         button.addEventListener("click", () =>{
             connectHandler(button)
         });
-        Object.assign(button.style, blueButtonStyle);
-        console.log('connect buttons found and event handlers attached')
+        Object.assign(button.style, greenButtonStyle);
       });
 }
-    sendResponse({ success: true });
+}, 300)
 }
 catch(e){
-    console.log(`error in sending response: ${e}`)
+    console.log(e)
 }
-
-  }
+}
 });
