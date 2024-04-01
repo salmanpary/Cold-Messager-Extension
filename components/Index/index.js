@@ -4,8 +4,9 @@ import { UserAuth } from '../../context/AuthContext';
 import BookmarksIcon from '@mui/icons-material/Bookmarks';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import CancelIcon from '@mui/icons-material/Cancel';
 import LoginIcon from '@mui/icons-material/Login';
-import Dropdown from '../Dropdown/Dropdown';
+import BasicSelect from '../Dropdown/BasicSelect';
 import Button from "@mui/material/Button";
 import { useState } from 'react';
 
@@ -16,6 +17,13 @@ export default function Index({ navigateToPage }) {
   const handleOptionSelect = (option) =>{
     setAutoConnectCount(option)
   }
+
+  const handleButtonClickCancel = () =>{
+    chrome.storage.local.set({"enableAutoConnect": false})
+    chrome.storage.local.set({"currentCount":"0"})
+    chrome.tabs.reload()
+  }
+
   const handleButtonClick = () =>{
    // Set local storage value for enableAutoConnect as true
    chrome.storage.local.set({"enableAutoConnect": true})
@@ -43,13 +51,13 @@ export default function Index({ navigateToPage }) {
                 text="Saved Templates"
                 startIcon={<BookmarksIcon/>}
               />
-              <div style={{ marginLeft: 'auto'}}>
+              <div style={{  display: 'flex', justifyContent:"space-between" , alignItems: 'center' }}>
               <Button
                 variant="contained"
                 sx={{
                   backgroundColor: '#ffcc4b !important',
                   color: 'black',
-                  width: '180px',
+                  width: '90%',
                   textTransform: 'none',
                   marginTop: '10px',
                   fontWeight: 'bold',
@@ -59,7 +67,22 @@ export default function Index({ navigateToPage }) {
                onClick={handleButtonClick} >
                 Auto Connect
               </Button>
-                <Dropdown options = {options} onOptionSelect = {handleOptionSelect}/>
+                <BasicSelect options = {options} onOptionSelect = {handleOptionSelect}/>
+                <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: '#ffcc4b !important',
+                  color: 'black',
+                  width: '90%',
+                  textTransform: 'none',
+                  marginTop: '10px',
+                  fontWeight: 'bold',
+                }}
+                size="large"
+                startIcon={<CancelIcon/>}
+               onClick={handleButtonClickCancel} >
+                Cancel
+              </Button>
               </div>
             </>
           ) : (
