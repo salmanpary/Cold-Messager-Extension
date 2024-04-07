@@ -506,14 +506,11 @@ const scrapingFunction = () => {
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.action === "runContentScript") {
-        console.log('received message to run content script')
         try {
 
             chrome.storage.local.get(["currentCount", "countAutoConnect"], result => {
                 const currentCount = result.currentCount;
                 const countAutoConnect = result.countAutoConnect;
-                console.log('Current count:', currentCount);
-                console.log('Limit:', countAutoConnect);
             });
 
             const user = JSON.parse(request.user.user)
@@ -525,7 +522,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 
             function fillContentEditableWithDummyText(message, contentBox) {
-                console.log(`fill function called with ${contentBox.tagName}`)
+               
                 if (contentBox.tagName.toLowerCase() === 'textarea') {
                     contentBox.value = message
                 }
@@ -538,20 +535,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             }
 
             function handleMessageButtonClick() {
-                console.log(`handle message button click called`)
+               
                 setTimeout(() => {
                     const contentEditableDivNodelist = document.querySelectorAll('.msg-form__contenteditable');
-                    if (contentEditableDivNodelist) {
-                        console.log('div list found')
-                    }
-                    console.log(contentEditableDivNodelist)
                     const messageField = contentEditableDivNodelist.item(contentEditableDivNodelist.length - 1);
-                    if (messageField) {
-                        console.log('message field found')
-                    }
+                   
                     extractedData = scrapingFunction();
                     setTimeout(() => {
-                        console.log('inside set timeout')
+                    
                         fillContentEditableWithDummyText('Loading...', messageField)
                         fetch('https://gmuf2naldzuc4nxlduhu4bnmce0lbfbn.lambda-url.eu-north-1.on.aws/', {
                             method: "POST",
@@ -575,7 +566,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 // Check if button1 has the expected text
                 if (buttonTextSpan && buttonTextSpan.textContent.trim() === "Message") {
                     button.addEventListener("click", handleMessageButtonClick);
-                    console.log('Added event listener to button for messaging')
+                   
                 } else {
                     if (button2) {
                         const buttonTextSpan = button2.querySelector(".artdeco-button__text");
@@ -591,11 +582,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             // PERSONALISED CONNECTION REQUEST RELATED
             //------------------------------------------------------------//
 
-            const greenButtonStyle = {
-                border: '2px solid #E1306C', // Instagram pink border
-                boxShadow: '0px 4px 4px rgba(255, 215, 0, 0.5)', // Yellow golden shadow
-            };
-
+           
 
 
             function handleAddNoteButtonClick() {
@@ -618,6 +605,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             }
 
             function connectHandler(connectButton) {
+            
                 try {
                     // if we click any of the filtered buttons, we need to check if we are in the search results url or the profiles url or did we find this profile on the right side of someone else's profile
                     if (window.location.href.toLowerCase().includes("https://www.linkedin.com/search/results")) {
@@ -627,14 +615,18 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                             const closestTitleLine = userProfileElement.querySelector('.entity-result__title-text');
                             if (closestTitleLine) {
                                 closestTitleLine.click()
+                               
                             }
                         }
                     }
                     // we cannot add connection note if we are trying to connect with a profile whose recommendation is on the side of someone else's profile
-                    const addNoteButton = document.querySelector('button[aria-label="Add a note"]');
-                    if (addNoteButton) {
-                        addNoteButton.addEventListener("click", handleAddNoteButtonClick)
-                    }
+                    setTimeout(() =>{
+                        const addNoteButton = document.querySelector('button[aria-label="Add a note"]');
+                        if (addNoteButton) {
+                            addNoteButton.addEventListener("click", handleAddNoteButtonClick)
+                        }
+                    }, 100)
+                    
                 }
                 catch (e) {
                     console.log(`error in connect handler ${e}`)
@@ -642,23 +634,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
             }
 
- // suppose we visit a profile who is not our connection. provision to add personalised note to that person 
- if (!window.location.href.includes("/search/results/")) {
-    const connectButtonsOnProfile = locateConnectButtons()
-    if (connectButtonsOnProfile && connectButtonsOnProfile.length > 0) {
-        connectButtonsOnProfile.forEach(button => {
-            button.addEventListener("click", () => {
-                connectHandler(button);
-            });
-            Object.assign(button.style, greenButtonStyle);
-        });
-    }
-}
-
+ 
             //   COMMON FOR AUTOCONNECT AND PERSONALISED CONNECTION REQUESTS
             //----------------------------------------------------------------------------
 
             function locateConnectButtons() {
+                
                 return new Promise(resolve => {
                     // Simulating time delay for locating connect buttons
                     setTimeout(() => {
@@ -673,16 +654,33 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 });
             }
 
+// suppose we visit a profile who is not our connection. provision to add personalised note to that person 
+async function connectNoteFromProfile(){
+    const connectButtonsOnProfile = await locateConnectButtons()
+    if (connectButtonsOnProfile && connectButtonsOnProfile.length > 0) {
+        connectButtonsOnProfile.forEach(button => {
+            button.addEventListener("click", () => {
+                connectHandler(button);
+            });
+        });
+    }
+}
+if (!window.location.href.includes("/search/results/")) {
+    connectNoteFromProfile()
+}
+
+
+
             // PERSONALISED CONNECT REQ
             // planning to call it whenever autoconnect is off or in case of premium users
             async function sendPersonalisedNotes() {
+                
                 const filteredButtons = await locateConnectButtons();
                 if (filteredButtons && filteredButtons.length > 0) {
                     filteredButtons.forEach(button => {
                         button.addEventListener("click", () => {
                             connectHandler(button);
                         });
-                        Object.assign(button.style, greenButtonStyle);
                     });
                 }
             }
@@ -699,17 +697,19 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     let nextPageButton;
                     let countLimitReached = false;
             
+                  
+                    
+
                     do {
                         const filteredButtons = await locateConnectButtons();
                         for (const connectButton of filteredButtons) {
                             if (countLimitReached) break; // Exit loop if count limit is reached
-                            Object.assign(connectButton.style, greenButtonStyle);
                             let nameOfPersonToConnect = connectButton.closest('.linked-area').querySelector('.entity-result__title-text').innerText;
                             connectButton.click();
                             await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms
                             const sendWithoutNoteButton = document.querySelector('button[aria-label="Send now"].artdeco-button--primary');
                             sendWithoutNoteButton.click();
-                            console.log(`Sent a connect request to ${nameOfPersonToConnect} without a note`);
+                            
                             await incrementCount();
                             await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms
             
@@ -718,7 +718,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                             if (countLimitReached) break; // Exit loop if count limit is reached
                         }
             
-                        if (countLimitReached) break; // Exit loop if count limit is reached
+                        if (countLimitReached ) break; // Exit loop if count limit is reached
             
                         document.documentElement.scrollTo({
                             top: document.documentElement.scrollHeight,
@@ -731,22 +731,20 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                             nextPageButton.click();
                             await new Promise(resolve => setTimeout(resolve, 3000));
                         }
-                        console.log('Next page button:', nextPageButton);
-                    } while (nextPageButton);
+                       
+                    } while (nextPageButton && await checkCountLimit());
             
-                    console.log('EXITING DO WHILE LOOP');
-                    console.log(nextPageButton);
-                    
+                  
                     // Reset storage variables if needed
                     if (countLimitReached) {
                         chrome.storage.local.set({ "enableAutoConnect": false });
                         chrome.storage.local.set({ "currentCount": "0" });
                     }
                 } catch (error) {
-                    console.error("Error in autoConnect:", error);
                     // Handle error and reset storage variables
                     chrome.storage.local.set({ "enableAutoConnect": false });
                     chrome.storage.local.set({ "currentCount": "0" });
+                    console.error(`Error in autoConnect ${error}, ${chrome.storage.local.get["enableAutoConnect"]}`);
                 }
             }
             
@@ -755,7 +753,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 let currentCount = await getCount();
                 currentCount++;
                 chrome.storage.local.set({ "currentCount": currentCount.toString() });
-                console.log('current count after increment is', await getCount());
+               
             }
 
             async function getCount() {
@@ -778,10 +776,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 try {
                     const countAutoConnect = await getCount();
                     const limit = await getLimit();
-                    console.log('Current count:', countAutoConnect);
-                    console.log('Limit:', limit);
+                    
                     const isWithinLimit = countAutoConnect < limit;
-                    console.log('Is within limit?', isWithinLimit);
+                    
                     return isWithinLimit;
                 } catch (error) {
                     console.error('Error in checkCountLimit:', error);
@@ -794,8 +791,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             chrome.storage.local.get(["enableAutoConnect"], result => {
                 if (result.enableAutoConnect && window.location.href.includes("www.linkedin.com/search/results/")) {
                     autoConnect();
-                } else {
+                } else if(window.location.href.includes("www.linkedin.com/search/results/")) {
                     sendPersonalisedNotes();
+                    
                 }
             });
 

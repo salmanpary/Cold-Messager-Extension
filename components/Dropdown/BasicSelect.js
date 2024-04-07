@@ -13,14 +13,14 @@ export default function BasicSelect({options, onOptionSelect}) {
     };
 
     return (
-        <Box sx={{ minWidth: 60 }}>
+        <Box sx={{ minWidth: 62}}>
             <FormControl fullWidth>
                 <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     value={limit}
                     onChange={handleChange}
-                    sx={{ width: '100%', p: 1, height: 'auto', margin: '12%' }} // Adjust width and padding
+                    sx={{ width: 'auto', p: 1, height: '32px',marginTop:'15px', marginLeft:'3px' }} 
                 >
                     {options.map((option) => (
                         <MenuItem key={option} value={option}>{option}</MenuItem>
