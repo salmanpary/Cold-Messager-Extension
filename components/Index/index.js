@@ -4,72 +4,104 @@ import { UserAuth } from '../../context/AuthContext';
 import BookmarksIcon from '@mui/icons-material/Bookmarks';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import CancelIcon from '@mui/icons-material/Cancel';
 import LoginIcon from '@mui/icons-material/Login';
-import Dropdown from '../Dropdown/Dropdown';
+import BasicSelect from '../Dropdown/BasicSelect';
 import Button from "@mui/material/Button";
 import { useState } from 'react';
 
 export default function Index({ navigateToPage }) {
   const { user } = UserAuth();
-  const options = [5,10,20,30,40,50]
-  const [autoConnectCount, setAutoConnectCount] = useState(options[0])
-  const handleOptionSelect = (option) =>{
-    setAutoConnectCount(option)
-  }
-  const handleButtonClick = () =>{
-   // Set local storage value for enableAutoConnect as true
-   chrome.storage.local.set({"enableAutoConnect": true})
-   // Set local storage value for countAutoConnect as autoConnectCount
-   chrome.storage.local.set({"countAutoConnect": autoConnectCount.toString()});
-   // setting current count in chrome.local.storage and not content script because it will get reinitialised when content script is ran again
-   chrome.storage.local.set({"currentCount":"0"})
-   chrome.tabs.reload()
-  }
+  const options = [5, 10, 20, 30, 40, 50];
+  const [autoConnectCount, setAutoConnectCount] = useState(options[0]);
+
+  const handleOptionSelect = (option) => {
+    setAutoConnectCount(option);
+  };
+
+  const handleButtonClickCancel = () => {
+    chrome.storage.local.set({ "enableAutoConnect": false });
+    chrome.storage.local.set({ "currentCount": "0" });
+    chrome.tabs.reload();
+  };
+
+  const handleButtonClick = () => {
+    chrome.storage.local.set({ "enableAutoConnect": true });
+    chrome.storage.local.set({ "countAutoConnect": autoConnectCount.toString() });
+    chrome.storage.local.set({ "currentCount": "0" });
+    chrome.tabs.reload();
+  };
+
   return (
     <div className={styles.container}>
       <main className={styles.main}>
-        <div className={styles.home__buttongroup} style={{ display: 'flex' }}>
+        <div className={styles.home__buttongroup} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {user ? (
             <>
-              <CustomButton
+            <CustomButton
                 href='https://www.coldmessager.com/profile/new-template'
                 target='_blank'
                 text="New Template"
-                startIcon={<LibraryAddIcon/>}
+                startIcon={<LibraryAddIcon />}
               />
               <CustomButton
                 href="https://www.coldmessager.com/profile/saved-templates"
                 target='_blank'
                 text="Saved Templates"
-                startIcon={<BookmarksIcon/>}
+                startIcon={<BookmarksIcon />}
               />
-              <div style={{ marginLeft: 'auto'}}>
-              <Button
-                variant="contained"
-                sx={{
-                  backgroundColor: '#ffcc4b !important',
-                  color: 'black',
-                  width: '180px',
-                  textTransform: 'none',
-                  marginTop: '10px',
-                  fontWeight: 'bold',
-                }}
-                size="large"
-                startIcon={<GroupAddIcon/>}
-               onClick={handleButtonClick} >
-                Auto Connect
-              </Button>
-                <Dropdown options = {options} onOptionSelect = {handleOptionSelect}/>
+              <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <BasicSelect options={options} onOptionSelect={handleOptionSelect} />
+                  <div style={{ marginLeft: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <Button
+                      variant="contained"
+                      sx={{
+                        backgroundColor: '#ffcc4b !important',
+                        color: 'black',
+                        width: '100%',
+                        textTransform: 'none',
+                        fontWeight: 'bold',
+                        marginTop: '15px',
+                        marginBottom: '2px'
+                      }}
+                      size="small"
+                      startIcon={<GroupAddIcon />}
+                      onClick={handleButtonClick}
+                    >
+                      Connect
+                    </Button>
+                  </div>
+                </div>
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: '#E32525 !important',
+                    color: 'black',
+                    width: '100%',
+                    textTransform: 'none',
+                    fontWeight: 'bold',
+                    marginTop: '10px',
+                    '&:hover': {
+                      backgroundColor: '#E32525 !important',
+                    },
+                  }}
+                  size="small"
+                  startIcon={<CancelIcon />}
+                  onClick={handleButtonClickCancel}
+                >
+                  Cancel
+                </Button>
               </div>
             </>
           ) : (
             <>
-              <h3 style={{ color: 'black' }}>Please login to continue</h3>
+              <h2 style={{ color: 'black' }}>Please login to continue</h2>
               <CustomButton
                 href="https://www.coldmessager.com/"
                 target='_blank'
                 text="Login"
-                startIcon={<LoginIcon/>}
+                startIcon={<LoginIcon />}
               />
             </>
           )}
